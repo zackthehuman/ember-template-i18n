@@ -1,6 +1,6 @@
 # Ember-template-i18n
 
-This README outlines the details of collaborating on this Ember addon.
+* **VERY IMPORTANT** that this addon runs before `ember-cli-htmlbars` otherwise it won't be able to process some templates (since they'll have been converted from `hbs` to `js` files already).
 
 ## Installation
 
