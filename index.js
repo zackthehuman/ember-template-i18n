@@ -1,7 +1,7 @@
 /* jshint node: true */
 'use strict';
 
-var Addon      = require('./lib/i18n-addon');
+var Addon      = require('./lib/models/i18n-addon');
 var Funnel     = require('broccoli-funnel');
 var stew       = require('broccoli-stew');
 var mergeTrees = require('broccoli-merge-trees');
