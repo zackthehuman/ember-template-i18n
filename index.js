@@ -9,7 +9,8 @@ var mergeTrees    = require('broccoli-merge-trees');
 var logger        = require('heimdalljs-logger')('main-i18n');
 var path          = require('path');
 
-var ADDON_NAME = 'ember-template-i18n';
+var ADDON_NAME      = 'ember-template-i18n';
+var PARENT          = 'parent';
 var SECRET_REGISTRY = ADDON_NAME + '-secret-registry';
 
 module.exports = Addon.extend({
@@ -21,31 +22,44 @@ module.exports = Addon.extend({
   },
 
   setupPreprocessorRegistry: function(type, registry) {
-    if (type === SECRET_REGISTRY) {
-      this.parentRegistry = registry;
-
-      registry.add(SECRET_REGISTRY, {
-        name: '[ember-template-i18n] extraction for "' + this.getParentName() + '"',
-        addon: this
-      });
-    } else if (type === 'parent') {
-      if (this.isNestedAddon()) {
-        logger.info('inside of another addon: ', this.getParentName(), '\n');
-      } else {
-        logger.info('inside of an app: ', this.getParentName(), '\n');
-      }
-
-      registry.add('template', {
-        name: '[ember-template-i18n] templates for "' + this.getParentName() + '"',
-        ext: 'hbs',
-        _addon: this,
-
-        toTree: function(tree) {
-          this._addon._treeForExtraction = new ExtractToJson([tree]);
-          return tree;
-        }
-      });
+    switch(type) {
+      case PARENT:
+        this.parentPreprocessorRegistrations(registry);
+        break;
+      case SECRET_REGISTRY:
+        this.translationPreprocessorRegistrations(registry);
+        break;
+      default:
+        break;
     }
+  },
+
+  translationPreprocessorRegistrations: function(registry) {
+    this.parentRegistry = registry;
+
+    registry.add(SECRET_REGISTRY, {
+      name: '[ember-template-i18n] extraction for "' + this.getParentName() + '"',
+      addon: this
+    });
+  },
+
+  parentPreprocessorRegistrations: function(registry) {
+    if (this.isNestedAddon()) {
+      logger.info('inside of another addon: ', this.getParentName(), '\n');
+    } else {
+      logger.info('inside of an app: ', this.getParentName(), '\n');
+    }
+
+    registry.add('template', {
+      name: '[ember-template-i18n] templates for "' + this.getParentName() + '"',
+      ext: 'hbs',
+      _addon: this,
+
+      toTree: function(tree) {
+        this._addon._treeForExtraction = new ExtractToJson([tree]);
+        return tree;
+      }
+    });
   },
 
   treeForPublic: function(tree) {
