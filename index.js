@@ -6,6 +6,7 @@ var ExtractToJson = require('./lib/broccoli/extract-to-json');
 var Funnel        = require('broccoli-funnel');
 var stew          = require('broccoli-stew');
 var mergeTrees    = require('broccoli-merge-trees');
+var logger        = require('heimdalljs-logger')('main-i18n');
 var path          = require('path');
 
 var ADDON_NAME = 'ember-template-i18n';
@@ -29,9 +30,9 @@ module.exports = Addon.extend({
       });
     } else if (type === 'parent') {
       if (this.isNestedAddon()) {
-        console.log('inside of another addon: ', this.getParentName(), '\n');
+        logger.info('inside of another addon: ', this.getParentName(), '\n');
       } else {
-        console.log('inside of an app: ', this.getParentName(), '\n');
+        logger.info('inside of an app: ', this.getParentName(), '\n');
       }
 
       registry.add('template', {
