@@ -44,10 +44,10 @@ module.exports = Addon.extend({
   },
 
   parentPreprocessorRegistrations: function(registry) {
-    if (this.isNestedAddon()) {
-      logger.info('inside of another addon: ', this.getParentName(), '\n');
-    } else {
+    if (this.isAppAddon()) {
       logger.info('inside of an app: ', this.getParentName(), '\n');
+    } else {
+      logger.info('inside of another addon: ', this.getParentName(), '\n');
     }
 
     registry.add('template', {
@@ -66,7 +66,7 @@ module.exports = Addon.extend({
     var publicTree = this._super.treeForPublic.apply(this, arguments);
     var trees = [publicTree];
 
-    if (!this.isNestedAddon()) {
+    if (this.isAppAddon()) {
       var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
       var translationTrees = mergeTrees(pluginWrappers.map(function(plugin) {
         var addon = plugin.addon;
