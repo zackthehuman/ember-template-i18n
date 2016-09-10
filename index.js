@@ -65,22 +65,19 @@ module.exports = Addon.extend({
   treeForPublic: function(tree) {
     var publicTree = this._super.treeForPublic.apply(this, arguments);
     var translationTree;
-    var trees = [];
 
     if (this.isAppAddon()) {
       var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
 
-      pluginWrappers.forEach(function(plugin) {
-        trees.push(plugin.addon._treeForTranslation());
-      });
-    }
+      var trees = pluginWrappers.map(function(plugin) {
+        return plugin.addon._treeForTranslation();
+      }).filter(Boolean);
 
-    trees = trees.filter(Boolean);
-
-    if (trees.length) {
-      translationTree = new Funnel(mergeTrees(trees, { overwrite: true }), {
-        destDir: path.join('i18n', 'properties')
-      });
+      if (trees.length) {
+        translationTree = new Funnel(mergeTrees(trees, { overwrite: true }), {
+          destDir: path.join('i18n', 'properties')
+        });
+      }
     }
 
     return mergeTrees([translationTree, publicTree].filter(Boolean));
