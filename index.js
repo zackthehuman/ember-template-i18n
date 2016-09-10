@@ -38,7 +38,7 @@ module.exports = Addon.extend({
     this.parentRegistry = registry;
 
     registry.add(SECRET_REGISTRY, {
-      name: '[ember-template-i18n] extraction for "' + this.getParentName() + '"',
+      name: '[' + ADDON_NAME + '] extraction for "' + this.getParentName() + '"',
       addon: this
     });
   },
@@ -51,7 +51,7 @@ module.exports = Addon.extend({
     }
 
     registry.add('template', {
-      name: '[ember-template-i18n] templates for "' + this.getParentName() + '"',
+      name: '[' + ADDON_NAME + '] templates for "' + this.getParentName() + '"',
       ext: 'hbs',
       _addon: this,
 
