@@ -1,4 +1,8 @@
-# Ember-template-i18n
+# ember-template-i18n
+
+## THIS ADDON IS A WORK IN PROGRESS
+
+* Don't use it for anything important yet.
 
 * **VERY IMPORTANT** that this addon runs before `ember-cli-htmlbars` otherwise it won't be able to process some templates (since they'll have been converted from `hbs` to `js` files already).
 
