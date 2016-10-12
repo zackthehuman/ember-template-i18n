@@ -23,6 +23,9 @@ module.exports = Addon.extend({
 
   setupPreprocessorRegistry: function(type, registry) {
     switch(type) {
+      case 'self':
+        this.selfPreprocessorRegistrations(registry);
+        break;
       case PARENT:
         this.parentPreprocessorRegistrations(registry);
         break;
@@ -62,15 +65,32 @@ module.exports = Addon.extend({
     });
   },
 
+  selfPreprocessorRegistrations: function(registry) {
+    console.log('lol');
+    registry.add('template', {
+      name: '[' + ADDON_NAME + '] templates for (self)',
+      ext: 'hbs',
+      _addon: this,
+
+      toTree: function(tree) {
+        this._addon._treeForSelfExtraction = stew.log(new ExtractToJson([tree]), { output: 'tree', label: 'self extraction for ' + this.getParentName() });
+        return tree;
+      }
+    });
+  },
+
   treeForPublic: function(tree) {
     var publicTree = this._super.treeForPublic.apply(this, arguments);
     var translationTree;
 
     if (this.isAppAddon()) {
+      console.log(this.parent.treePaths);
       var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
 
       var trees = pluginWrappers.map(function(plugin) {
-        return plugin.addon._treeForTranslation();
+        plugin.addon._treeForParentAppTemplates();
+        plugin.addon._treeForParentAddonTemplates();
+        return stew.log(plugin.addon._treeForTranslation(), { output: 'tree', label: plugin.addon.getParentName() });
       }).filter(Boolean);
 
       if (trees.length) {
