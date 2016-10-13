@@ -68,7 +68,6 @@ module.exports = Addon.extend({
   },
 
   selfPreprocessorRegistrations: function(registry) {
-    console.log('lol');
     registry.add('template', {
       name: '[' + ADDON_NAME + '] templates for (self)',
       ext: 'hbs',
