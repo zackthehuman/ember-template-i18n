@@ -103,12 +103,20 @@ module.exports = Addon.extend({
       var host = this._findHost();
       var hostName = result(host, 'name');
       var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
+      var seenAddons = Object.create(null);
 
       var trees = pluginWrappers.map(function(plugin) {
         thisAddon.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
         var addonName = plugin.addon.getParentName();
         var addonRoot = plugin.addon.parent.root;
         var pathToAddon = path.relative(thisRoot, addonRoot); //addonRoot.replace(thisRoot, '').replace(/^\//, '');
+
+        if (seenAddons[addonName]) {
+          thisAddon.ui.writeInfoLine(addonName + ' has already been processed for i18n, ignoring duplicate.');
+          return;
+        } else {
+          seenAddons[addonName] = true;
+        }
 
         // console.log('pathToAddon:', pathToAddon);
 
