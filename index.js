@@ -81,8 +81,7 @@ module.exports = Addon.extend({
   },
 
   treeForPublic: function(tree) {
-    var thisAddon = this;
-    var thisRoot = thisAddon.parent.root;
+    var thisRoot = this.parent.root;
     var publicTree = this._super.treeForPublic.apply(this, arguments);
     var translationTree;
 
@@ -93,13 +92,13 @@ module.exports = Addon.extend({
       var seenAddons = Object.create(null);
 
       var trees = pluginWrappers.map(function(plugin) {
-        thisAddon.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
+        this.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
         var addonName = plugin.addon.getParentName();
         var addonRoot = plugin.addon.parent.root;
         var pathToAddon = path.relative(thisRoot, addonRoot);
 
         if (seenAddons[addonName]) {
-          thisAddon.ui.writeInfoLine(addonName + ' has already been processed for i18n, ignoring duplicate.');
+          this.ui.writeInfoLine(addonName + ' has already been processed for i18n, ignoring duplicate.');
           return;
         } else {
           seenAddons[addonName] = true;
@@ -167,7 +166,7 @@ module.exports = Addon.extend({
 
         return stew.log(merged, { output: 'tree', label: plugin.addon.getParentName() });
         //return stew.log(plugin.addon._treeForTranslation(), { output: 'tree', label: plugin.addon.getParentName() });
-      }).filter(Boolean);
+      }, this).filter(Boolean);
 
       if (trees.length) {
         translationTree = new Funnel(mergeTrees(trees, { overwrite: true }), {
