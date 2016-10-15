@@ -117,7 +117,7 @@ module.exports = Addon.extend({
 
         if (appTemplates) {
           movedTrees.push(new Funnel(appTemplates, {
-            destDir: path.join(addonName, 'templates')
+            destDir: path.join(hostName, 'templates')
           }));
         }
 
@@ -135,7 +135,7 @@ module.exports = Addon.extend({
           var funnelOptions = {
             getDestinationPath: function(relativePath) {
               if (relativePath.indexOf('app/') === 0) {
-                return path.join(addonName, relativePath.replace('app/', ''));
+                return path.join(hostName, relativePath.replace('app/', ''));
               } else if (relativePath.indexOf('addon/') === 0) {
                 return path.join('modules', addonName, relativePath.replace('addon/', ''));
               }
