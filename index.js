@@ -87,19 +87,6 @@ module.exports = Addon.extend({
     var translationTree;
 
     if (this.isAppAddon()) {
-      // this._findHost().project.addons.forEach(function(addon) {
-      //   var name = result(addon, 'name');
-      //   var parent = addon.parent;
-      //   var parentName = result(parent, 'name');
-
-      //   if (name === thisAddon.name) {
-      //     console.log('name:', name, 'parent:', parentName);
-      //   }
-      //   // if (name === 'shared') {
-      //   //   console.log(addon.addons.map(function(addon) { return result(addon, 'name'); }));
-      //   // }
-      // });
-
       var host = this._findHost();
       var hostName = result(host, 'name');
       var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
@@ -109,7 +96,7 @@ module.exports = Addon.extend({
         thisAddon.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
         var addonName = plugin.addon.getParentName();
         var addonRoot = plugin.addon.parent.root;
-        var pathToAddon = path.relative(thisRoot, addonRoot); //addonRoot.replace(thisRoot, '').replace(/^\//, '');
+        var pathToAddon = path.relative(thisRoot, addonRoot);
 
         if (seenAddons[addonName]) {
           thisAddon.ui.writeInfoLine(addonName + ' has already been processed for i18n, ignoring duplicate.');
@@ -117,8 +104,6 @@ module.exports = Addon.extend({
         } else {
           seenAddons[addonName] = true;
         }
-
-        // console.log('pathToAddon:', pathToAddon);
 
         var movedTrees = [];
         var appTemplates = plugin.addon._treeForParentAppTemplates();
