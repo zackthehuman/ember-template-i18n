@@ -3,6 +3,7 @@
 
 var Addon         = require('./lib/models/i18n-addon');
 var ExtractToJson = require('./lib/broccoli/extract-to-json');
+var CombineStrings = require('./lib/broccoli/combine-strings');
 var Funnel        = require('broccoli-funnel');
 var stew          = require('broccoli-stew');
 var mergeTrees    = require('broccoli-merge-trees');
@@ -15,6 +16,19 @@ var ADDON_NAME      = 'ember-template-i18n';
 var PARENT          = 'parent';
 var SECRET_REGISTRY = ADDON_NAME + '-secret-registry';
 
+function extractAs(tree, locale) {
+  if (tree) {
+    return new Funnel(new ExtractToJson([tree]), {
+      getDestinationPath: function(relativePath) {
+        var dirname = path.dirname(relativePath);
+        var basename = path.basename(relativePath, '.hbs');
+
+        return path.join(dirname, basename + '_' + locale + '.properties');
+      }
+    });
+  }
+}
+
 module.exports = Addon.extend({
   name: ADDON_NAME,
 
@@ -25,16 +39,25 @@ module.exports = Addon.extend({
 
   setupPreprocessorRegistry: function(type, registry) {
     switch(type) {
-      case 'self':
-        this.selfPreprocessorRegistrations(registry);
-        break;
-      case PARENT:
-        this.parentPreprocessorRegistrations(registry);
-        break;
       case SECRET_REGISTRY:
         this.translationPreprocessorRegistrations(registry);
         break;
       default:
+        registry.add('htmlbars-ast-plugin', {
+          name: 't-def-remover',
+          plugin: require('./lib/handlebars/t-def-remover'),
+          baseDir: function() {
+            return __dirname;
+          }
+        });
+
+        registry.add('htmlbars-ast-plugin', {
+          name: 't-namespace-inserter',
+          plugin: require('./lib/handlebars/t-namespace-inserter'),
+          baseDir: function() {
+            return __dirname;
+          }
+        });
         break;
     }
   },
@@ -80,9 +103,9 @@ module.exports = Addon.extend({
     });
   },
 
-  treeForPublic: function(tree) {
+  treeForAddon: function(tree) {
     var thisRoot = this.parent.root;
-    var publicTree = this._super.treeForPublic.apply(this, arguments);
+    var publicTree = this._super.treeForAddon.apply(this, arguments);
     var translationTree;
 
     if (this.isAppAddon()) {
@@ -108,17 +131,27 @@ module.exports = Addon.extend({
         var appTemplates = plugin.addon._treeForParentAppTemplates();
 
         if (appTemplates) {
-          movedTrees.push(new Funnel(appTemplates, {
-            destDir: path.join(hostName, 'templates')
-          }));
+          movedTrees.push(
+            extractAs(
+              new Funnel(appTemplates, {
+                destDir: path.join(hostName, 'templates')
+              }),
+              'en_US'
+            )
+          );
         }
 
         var addonTemplates = plugin.addon._treeForParentAddonTemplates();
 
         if (addonTemplates) {
-          movedTrees.push(new Funnel(addonTemplates, {
-            destDir: path.join('modules', addonName, 'templates')
-          }));
+          movedTrees.push(
+            extractAs(
+              new Funnel(addonTemplates, {
+                destDir: path.join('modules', addonName, 'templates')
+              }),
+              'en_US'
+            )
+          );
         }
 
         var properties = plugin.addon._treeForTranslatedProperties();
@@ -164,17 +197,26 @@ module.exports = Addon.extend({
 
         var merged = mergeTrees(movedTrees);
 
-        return stew.log(merged, { output: 'tree', label: plugin.addon.getParentName() });
+        return merged;
         //return stew.log(plugin.addon._treeForTranslation(), { output: 'tree', label: plugin.addon.getParentName() });
       }, this).filter(Boolean);
 
+
       if (trees.length) {
-        translationTree = new Funnel(mergeTrees(trees, { overwrite: true }), {
-          destDir: path.join('i18n', 'properties')
+        trees = mergeTrees(trees.concat(new CombineStrings(trees)));
+        translationTree = new Funnel(mergeTrees([trees], { overwrite: true }), {
+          include: ['**/*.js'],
+          destDir: path.join('modules', result(this, 'name'), 'utils')
         });
       }
     }
 
-    return mergeTrees([translationTree, publicTree].filter(Boolean));
+    return stew.log(
+      mergeTrees([translationTree, publicTree].filter(Boolean)),
+      {
+        output: 'tree',
+        label: 'addon tree'
+      }
+    );
   }
 });
