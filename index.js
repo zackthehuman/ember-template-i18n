@@ -147,7 +147,7 @@ module.exports = Addon.extend({
           movedTrees.push(
             extractAs(
               new Funnel(addonTemplates, {
-                destDir: path.join('modules', addonName, 'templates')
+                destDir: path.join(addonName, 'templates')
               }),
               'en_US'
             )
@@ -162,7 +162,7 @@ module.exports = Addon.extend({
               if (relativePath.indexOf('app/') === 0) {
                 return path.join(hostName, relativePath.replace('app/', ''));
               } else if (relativePath.indexOf('addon/') === 0) {
-                return path.join('modules', addonName, relativePath.replace('addon/', ''));
+                return path.join(addonName, relativePath.replace('addon/', ''));
               }
 
               return relativePath;
@@ -203,10 +203,14 @@ module.exports = Addon.extend({
 
 
       if (trees.length) {
-        trees = mergeTrees(trees.concat(new CombineStrings(trees)));
-        translationTree = new Funnel(mergeTrees([trees], { overwrite: true }), {
+        const combined = new CombineStrings(trees);
+
+        trees = mergeTrees(trees.concat(combined), { overwrite: true });
+        translationTree = this.preprocessJs(new Funnel(trees, {
           include: ['**/*.js'],
-          destDir: path.join('modules', result(this, 'name'), 'utils')
+          destDir: path.join(result(this, 'name'), 'utils')
+        }), {
+          registry: this.registry
         });
       }
     }

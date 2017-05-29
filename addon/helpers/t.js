@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import require from 'require';
 
 const {
   get,
