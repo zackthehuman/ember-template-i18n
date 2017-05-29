@@ -204,12 +204,13 @@ module.exports = Addon.extend({
 
       if (trees.length) {
         const combined = new CombineStrings(trees);
-
-        trees = mergeTrees(trees.concat(combined), { overwrite: true });
-        translationTree = this.preprocessJs(new Funnel(trees, {
+        const moved = new Funnel(combined, {
           include: ['**/*.js'],
+          // Drop the strings into `ember-template-i18n/utils/*.js`
           destDir: path.join(result(this, 'name'), 'utils')
-        }), {
+        });
+
+        translationTree = this.preprocessJs(, {
           registry: this.registry
         });
       }
