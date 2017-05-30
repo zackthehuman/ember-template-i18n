@@ -213,7 +213,6 @@ module.exports = Addon.extend({
         const merged = mergeTrees(movedTrees);
 
         return merged;
-        //return debugLogTree(plugin.addon._treeForTranslation(), plugin.addon.getParentName());
       }, this).filter(Boolean);
 
 
