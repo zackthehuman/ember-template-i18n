@@ -1,7 +1,7 @@
 {
   "name": "ember-template-i18n",
   "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "description": "Template-based i18n strings for Ember",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -11,7 +11,7 @@
     "start": "ember server",
     "test": "ember try:each"
   },
-  "repository": "",
+  "repository": "https://github.com/zackthehuman/ember-template-i18n",
   "engines": {
     "node": ">= 4"
   },
