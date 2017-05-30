@@ -1,15 +1,16 @@
 /* jshint node: true */
 'use strict';
 
-const Addon         = require('./lib/models/i18n-addon');
-const ExtractToJson = require('./lib/broccoli/extract-to-json');
+const I18NAddon      = require('./lib/models/i18n-addon');
+const ExtractToJson  = require('./lib/broccoli/extract-to-json');
 const CombineStrings = require('./lib/broccoli/combine-strings');
-const Funnel        = require('broccoli-funnel');
-const stew          = require('broccoli-stew');
-const mergeTrees    = require('broccoli-merge-trees');
-const logger        = require('heimdalljs-logger')('main-i18n');
-const path          = require('path');
-const result        = require('lodash.result');
+const Funnel         = require('broccoli-funnel');
+const stew           = require('broccoli-stew');
+const mergeTrees     = require('broccoli-merge-trees');
+const logger         = require('heimdalljs-logger')('main-i18n');
+const path           = require('path');
+const result         = require('lodash.result');
+const merge          = require('lodash.merge');
 
 
 const ADDON_NAME      = 'ember-template-i18n';
@@ -41,7 +42,7 @@ function debugLogTree(tree, label) {
   return tree;
 }
 
-module.exports = Addon.extend({
+module.exports = merge({}, I18NAddon, {
   name: ADDON_NAME,
 
   included: function (app) {
@@ -130,7 +131,7 @@ module.exports = Addon.extend({
       const seenAddons = Object.create(null);
 
       const trees = pluginWrappers.map(function(plugin) {
-        this.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
+        this.ui.writeInfoLine('[ember-template-i18n] via ' + plugin.addon.getAddonPathToParent());
         const addonName = plugin.addon.getParentName();
         const addonRoot = plugin.addon.parent.root;
         const pathToAddon = path.relative(thisRoot, addonRoot);
