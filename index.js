@@ -15,6 +15,7 @@ var result        = require('lodash.result');
 var ADDON_NAME      = 'ember-template-i18n';
 var PARENT          = 'parent';
 var SECRET_REGISTRY = ADDON_NAME + '-secret-registry';
+var DEBUG_I18N      = true;
 
 function extractAs(tree, locale) {
   if (tree) {
@@ -27,6 +28,17 @@ function extractAs(tree, locale) {
       }
     });
   }
+}
+
+function debugLogTree(tree, label) {
+  if (DEBUG_I18N) {
+    return stew.log(tree, {
+      output: 'tree',
+      label: label
+    });
+  }
+
+  return tree;
 }
 
 module.exports = Addon.extend({
@@ -97,7 +109,10 @@ module.exports = Addon.extend({
       _addon: this,
 
       toTree: function(tree) {
-        this._addon._treeForSelfExtraction = stew.log(new ExtractToJson([tree]), { output: 'tree', label: 'self extraction for ' + this.getParentName() });
+        this._addon._treeForSelfExtraction = debugLogTree(
+          new ExtractToJson([tree]),
+          'self extraction for ' + this.getParentName()
+        );
         return tree;
       }
     });
@@ -198,7 +213,7 @@ module.exports = Addon.extend({
         var merged = mergeTrees(movedTrees);
 
         return merged;
-        //return stew.log(plugin.addon._treeForTranslation(), { output: 'tree', label: plugin.addon.getParentName() });
+        //return debugLogTree(plugin.addon._treeForTranslation(), plugin.addon.getParentName());
       }, this).filter(Boolean);
 
 
@@ -210,13 +225,13 @@ module.exports = Addon.extend({
           destDir: path.join(result(this, 'name'), 'utils')
         });
 
-        translationTree = this.preprocessJs(, {
+        translationTree = this.preprocessJs(moved, {
           registry: this.registry
         });
       }
     }
 
-    return stew.log(
+    return debugLogTree(
       mergeTrees([translationTree, publicTree].filter(Boolean)),
       'i18n-processed addon tree for ' + this.getParentName()
     );
