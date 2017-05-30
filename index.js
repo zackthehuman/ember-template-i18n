@@ -218,10 +218,7 @@ module.exports = Addon.extend({
 
     return stew.log(
       mergeTrees([translationTree, publicTree].filter(Boolean)),
-      {
-        output: 'tree',
-        label: 'addon tree'
-      }
+      'i18n-processed addon tree for ' + this.getParentName()
     );
   }
 });
