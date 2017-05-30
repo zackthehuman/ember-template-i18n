@@ -6,14 +6,11 @@
 
 * **VERY IMPORTANT** that this addon runs before `ember-cli-htmlbars` otherwise it won't be able to process some templates (since they'll have been converted from `hbs` to `js` files already).
 
-* Third bullet point for emphasis.
-
 ## Installation
 
 * `git clone <repository-url>` this repository
 * `cd ember-template-i18n`
 * `npm install`
-* `bower install`
 
 ## Running
 
