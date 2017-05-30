@@ -1,4 +1,3 @@
-/* jshint node: true */
 'use strict';
 
 const I18NAddon      = require('./lib/models/i18n-addon');
