@@ -83,41 +83,6 @@ module.exports = merge({}, I18NAddon, {
     });
   },
 
-  parentPreprocessorRegistrations: function(registry) {
-    if (this.isAppAddon()) {
-      logger.info('inside of an app: ', this.getParentName(), '\n');
-    } else {
-      logger.info('inside of another addon: ', this.getParentName(), '\n');
-    }
-
-    registry.add('template', {
-      name: '[' + ADDON_NAME + '] templates for "' + this.getParentName() + '"',
-      ext: 'hbs',
-      _addon: this,
-
-      toTree: function(tree) {
-        this._addon._treeForExtraction = new ExtractToJson([tree]);
-        return tree;
-      }
-    });
-  },
-
-  selfPreprocessorRegistrations: function(registry) {
-    registry.add('template', {
-      name: '[' + ADDON_NAME + '] templates for (self)',
-      ext: 'hbs',
-      _addon: this,
-
-      toTree: function(tree) {
-        this._addon._treeForSelfExtraction = debugLogTree(
-          new ExtractToJson([tree]),
-          'self extraction for ' + this.getParentName()
-        );
-        return tree;
-      }
-    });
-  },
-
   treeForAddon: function(tree) {
     const thisRoot = this.parent.root;
     const publicTree = this._super.treeForAddon.apply(this, arguments);
