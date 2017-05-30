@@ -1,28 +1,28 @@
 /* jshint node: true */
 'use strict';
 
-var Addon         = require('./lib/models/i18n-addon');
-var ExtractToJson = require('./lib/broccoli/extract-to-json');
-var CombineStrings = require('./lib/broccoli/combine-strings');
-var Funnel        = require('broccoli-funnel');
-var stew          = require('broccoli-stew');
-var mergeTrees    = require('broccoli-merge-trees');
-var logger        = require('heimdalljs-logger')('main-i18n');
-var path          = require('path');
-var result        = require('lodash.result');
+const Addon         = require('./lib/models/i18n-addon');
+const ExtractToJson = require('./lib/broccoli/extract-to-json');
+const CombineStrings = require('./lib/broccoli/combine-strings');
+const Funnel        = require('broccoli-funnel');
+const stew          = require('broccoli-stew');
+const mergeTrees    = require('broccoli-merge-trees');
+const logger        = require('heimdalljs-logger')('main-i18n');
+const path          = require('path');
+const result        = require('lodash.result');
 
 
-var ADDON_NAME      = 'ember-template-i18n';
-var PARENT          = 'parent';
-var SECRET_REGISTRY = ADDON_NAME + '-secret-registry';
-var DEBUG_I18N      = true;
+const ADDON_NAME      = 'ember-template-i18n';
+const PARENT          = 'parent';
+const SECRET_REGISTRY = ADDON_NAME + '-secret-registry';
+const DEBUG_I18N      = true;
 
 function extractAs(tree, locale) {
   if (tree) {
     return new Funnel(new ExtractToJson([tree]), {
       getDestinationPath: function(relativePath) {
-        var dirname = path.dirname(relativePath);
-        var basename = path.basename(relativePath, '.hbs');
+        const dirname = path.dirname(relativePath);
+        const basename = path.basename(relativePath, '.hbs');
 
         return path.join(dirname, basename + '_' + locale + '.properties');
       }
@@ -119,21 +119,21 @@ module.exports = Addon.extend({
   },
 
   treeForAddon: function(tree) {
-    var thisRoot = this.parent.root;
-    var publicTree = this._super.treeForAddon.apply(this, arguments);
-    var translationTree;
+    const thisRoot = this.parent.root;
+    const publicTree = this._super.treeForAddon.apply(this, arguments);
+    let translationTree;
 
     if (this.isAppAddon()) {
-      var host = this._findHost();
-      var hostName = result(host, 'name');
-      var pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
-      var seenAddons = Object.create(null);
+      const host = this._findHost();
+      const hostName = result(host, 'name');
+      const pluginWrappers = this.parentRegistry.load(SECRET_REGISTRY);
+      const seenAddons = Object.create(null);
 
-      var trees = pluginWrappers.map(function(plugin) {
+      const trees = pluginWrappers.map(function(plugin) {
         this.ui.writeInfoLine(plugin.addon.getAddonPathToParent());
-        var addonName = plugin.addon.getParentName();
-        var addonRoot = plugin.addon.parent.root;
-        var pathToAddon = path.relative(thisRoot, addonRoot);
+        const addonName = plugin.addon.getParentName();
+        const addonRoot = plugin.addon.parent.root;
+        const pathToAddon = path.relative(thisRoot, addonRoot);
 
         if (seenAddons[addonName]) {
           this.ui.writeInfoLine(addonName + ' has already been processed for i18n, ignoring duplicate.');
@@ -142,8 +142,8 @@ module.exports = Addon.extend({
           seenAddons[addonName] = true;
         }
 
-        var movedTrees = [];
-        var appTemplates = plugin.addon._treeForParentAppTemplates();
+        const movedTrees = [];
+        const appTemplates = plugin.addon._treeForParentAppTemplates();
 
         if (appTemplates) {
           movedTrees.push(
@@ -156,7 +156,7 @@ module.exports = Addon.extend({
           );
         }
 
-        var addonTemplates = plugin.addon._treeForParentAddonTemplates();
+        const addonTemplates = plugin.addon._treeForParentAddonTemplates();
 
         if (addonTemplates) {
           movedTrees.push(
@@ -169,10 +169,10 @@ module.exports = Addon.extend({
           );
         }
 
-        var properties = plugin.addon._treeForTranslatedProperties();
+        const properties = plugin.addon._treeForTranslatedProperties();
 
         if (properties) {
-          var funnelOptions = {
+          const funnelOptions = {
             getDestinationPath: function(relativePath) {
               if (relativePath.indexOf('app/') === 0) {
                 return path.join(hostName, relativePath.replace('app/', ''));
@@ -210,7 +210,7 @@ module.exports = Addon.extend({
           movedTrees.push(new Funnel(properties, funnelOptions));
         }
 
-        var merged = mergeTrees(movedTrees);
+        const merged = mergeTrees(movedTrees);
 
         return merged;
         //return debugLogTree(plugin.addon._treeForTranslation(), plugin.addon.getParentName());
